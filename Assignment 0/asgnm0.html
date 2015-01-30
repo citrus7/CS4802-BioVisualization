@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- Load the Paper.js library -->
+<script type="text/javascript" src="js/paper-full.min.js"></script>
+<!-- Define inlined PaperScript associate it with myCanvas -->
+<script type="text/paperscript" canvas="myCanvas">
+
+
+	// Create Circle
+	var myCircle = new Path.Circle(new Point(100, 70), 5);
+	myCircle.fillColor = 'black';
+	// Circle 2
+	var myCircle = new Path.Circle(new Point(200, 70), 15);
+	myCircle.fillColor = 'blue';
+	// Circle 3
+	var myCircle = new Path.Circle(new Point(300, 70), 30);
+	myCircle.fillColor = 'yellow';
+	
+	
+	// Create path
+	var path = new Path();
+	// Color
+	path.strokeColor = 'black';
+	// Starting point
+	var start = new Point(100, 200);
+	path.moveTo(start);
+	path.lineTo(start + [ 100, -50 ]);
+	
+	// Create path
+	var path1 = new Path();
+	// Color
+	path1.strokeColor = 'green';
+	// Starting point
+	var start1 = new Point(300, 200);
+	path1.moveTo(start1);
+	path1.lineTo(start1 + [ 100, 50 ]);
+	
+	// Create path
+	var path2 = new Path();
+	// Color
+	path2.strokeColor = 'red';
+	// Starting point
+	var start2 = new Point(500, 200);
+	path2.moveTo(start2);
+	path2.lineTo(start2 + [ 100, 0 ]);
+	
+	// Simple Shape
+	var path3 = new Path();
+	path3.strokeColor = 'black';
+	path3.add(new Point(100, 375)); 
+	path3.add(new Point(100, 325)); 
+	path3.add(new Point(150, 325));
+	path3.add(new Point(150, 375));
+	path3.closed = true;
+	
+	//copy of shape
+	var copy = path3.clone();
+	copy.fullySelected = true;
+	copy.strokeColor = 'green'
+	copy.position.x += 100;
+
+// Smooth the segments of the copy:
+copy.smooth();
+</script>
+</head>
+<body>
+	<canvas id="myCanvas" resize></canvas>
+</body>
+</html>

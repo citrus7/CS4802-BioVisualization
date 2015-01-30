@@ -1,0 +1,9 @@
+CS4802 - Biovisualization
+Assignment 0
+Jonathan Wu - jtwu
+
+Simple program to display points, lines, and polygons.
+Program is written using HTML/Javascript and the Paper.js library:
+http://paperjs.org/
+
+To run the project open the asgnm0.html file with a browser (tested on Chrome)
