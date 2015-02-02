@@ -1,0 +1,162 @@
+//Jonathan Wu
+//CS 4803 visualization Assignment 1
+//Conway's Game of Life
+<!DOCTYPE html>
+<html>
+<head>
+<!-- Load the Paper.js library -->
+<script type="text/javascript" src="js/paper-full.min.js"></script>
+<!-- Define inlined PaperScript associate it with myCanvas -->
+<script type="text/paperscript" canvas="myCanvas">
+
+	var update = 1;
+	var count = 0;
+	//Initialize Array
+	var lifeArray = [];
+	for (i = 0; i < 625; i++) { 
+		lifeArray[i] = ((Math.random()*2)|0);
+		}
+
+
+	lifeArray = updateArray(lifeArray);
+	
+	
+	//update button
+	var updateText = new PointText({
+		point: [500, 250],
+		content: 'Update',
+		fillColor: 'black',
+		fontFamily: 'Courier New',
+		fontWeight: 'bold',
+		fontSize: 25
+	});
+	updateText.onClick = function(event){
+		lifeArray = updateArray(lifeArray);
+		count += 1;
+		updateCount.content = count;
+	}
+	updateText.fullySelected = true;
+	
+	//count
+	var iterations = new PointText({
+		point: [450, 100],
+		content: 'Iterations:',
+		fillColor: 'black',
+		fontFamily: 'Courier New',
+		fontWeight: 'bold',
+		fontSize: 25
+	});
+	
+	var updateCount = new PointText({
+		point: [625, 100],
+		content: count,
+		fillColor: 'black',
+		fontFamily: 'Courier New',
+		fontWeight: 'bold',
+		fontSize: 25
+	});
+	
+	
+	function updateArray(lifeArray){
+		var newArray = [];
+		
+		//update array
+		for (i = 0; i < 625; i++) {
+			var count = 0;
+			var life = lifeArray[i]
+			
+			//Upper Left Corner
+			if(i == 0){
+				count += lifeArray[1] + lifeArray[25] + lifeArray[26];
+			}
+			//Upper Right Corner
+			else if(i == 24){
+				count += lifeArray[23] + lifeArray[48] + lifeArray[49];
+			}
+			//Lower Right Corner
+			else if(i == 624){
+				count += lifeArray[598] + lifeArray[599] + lifeArray[623];
+			}
+			//Lower Left Corner
+			else if(i == 600){
+				count += lifeArray[575] + lifeArray[576] + lifeArray[601];
+			}
+			//Left
+			else if(i%25 == 0){
+				count += lifeArray[i-25] + lifeArray[i-24] + lifeArray[i+1] + lifeArray[i+25] + lifeArray[i+26];
+			}
+			//Up
+			else if(i<25){
+				count += lifeArray[i-1] + lifeArray[i+1] + lifeArray[i+24] + lifeArray[i+25] + lifeArray[i+26];
+			}
+			//Right
+			else if(i%25 == 24){
+				count += lifeArray[i-25] + lifeArray[i-26] + lifeArray[i-1] + lifeArray[i+24] + lifeArray[i+25];
+			}
+			//Down
+			else if(i > 600){
+				count += lifeArray[i-1] + lifeArray[i-26] + lifeArray[i-25] + lifeArray[i-24] + lifeArray[i+1];
+			}
+			//Else
+			else{
+				count += lifeArray[i-26] + lifeArray[i-25] + lifeArray[i-24] + lifeArray[i-1] + lifeArray[i+1] + lifeArray[i+24] + lifeArray[i+25] + lifeArray[i+26];
+			}
+			
+			//live cell with fewer than 2 neighbours dies
+			//live cell with 2 or 3 neighbours lives
+			//live cell with more than 3 neighbours dies
+			if(life == 1){
+				if(!(count == 2 || count == 3)){
+					life = 0;
+				}
+			}
+			//dead cell with exactly three live neighbours becomes live
+			else{
+				if(count == 3){
+					life = 1;
+				}
+			}
+			newArray[i] = life;
+
+		}
+	
+		//first square
+		var mySquare = new Path.Rectangle(new Point(50, 50), 15);
+		if(newArray[0] == 1){
+			mySquare.fillColor = 'black';
+		}
+		else{
+			mySquare.fillColor = 'white';
+		}
+		mySquare.fullySelected = true;
+		//draw array
+		for (i = 1; i < 625; i++) { 
+			var copy = mySquare.clone();
+			copy.fullySelected = true;
+			//set color
+			
+			if(newArray[i] == 1){
+			copy.fillColor = "black";
+			}
+			else if(newArray[i] == 0){
+			copy.fillColor = "white";
+			}
+			copy.strokeColor = 'green';
+			copy.position.x += (i%25*15);
+			copy.position.y += ((i/25)|0)*15;
+		}
+		
+		return newArray;
+			
+	}
+	
+
+	
+
+</script>
+
+</head>
+<body>
+	<canvas id="myCanvas" resize></canvas>
+</body>
+</html>
