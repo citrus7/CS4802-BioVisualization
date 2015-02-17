@@ -1,6 +1,6 @@
-//Jonathan Wu
-//CS 4803 visualization Assignment 1
-//Conway's Game of Life
+<!--Jonathan Wu
+CS 4803 visualization Assignment 1
+Conway's Game of Life-->
 <!DOCTYPE html>
 <html>
 <head>
@@ -11,6 +11,7 @@
 
 	var update = 1;
 	var count = 0;
+	var grid = new Group();
 	//Initialize Array
 	var lifeArray = [];
 	for (i = 0; i < 625; i++) { 
@@ -31,6 +32,7 @@
 		fontSize: 25
 	});
 	updateText.onClick = function(event){
+		grid.removeChildren();
 		lifeArray = updateArray(lifeArray);
 		count += 1;
 		updateCount.content = count;
@@ -144,6 +146,7 @@
 			copy.strokeColor = 'green';
 			copy.position.x += (i%25*15);
 			copy.position.y += ((i/25)|0)*15;
+			grid.addChild(copy);
 		}
 		
 		return newArray;

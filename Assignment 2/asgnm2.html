@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<!--Jonathan Wu
+CS 4803 visualization Assignment 1
+Conway's Game of Life-->
+<html>
+<head>
+</head>
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+
+<script>
+var margin = {top: 20, right: 120, bottom: 20, left: 120},
+ width = 960 - margin.right - margin.left,
+ height = 500 - margin.top - margin.bottom;
+ 
+var i = 0;
+
+var tree = d3.layout.tree()
+ .size([height, width]);
+
+var diagonal = d3.svg.diagonal()
+ .projection(function(d) { return [d.y, d.x]; });
+
+var svg = d3.select("body").append("svg")
+ .attr("width", width + margin.right + margin.left)
+ .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+ .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+ 
+var rows;
+var dups;
+
+d3.csv("zoodata.csv", function(loadedRows) {
+  rows = loadedRows;
+  doSomethingWithRows();
+});
+
+function doSomethingWithRows() {
+  // do something with rows
+	console.log(rows);
+	generateTree();
+	console.log(rows);
+	root = rows[0];
+	update(root);
+}
+function update(source) {
+
+  // Compute the new tree layout.
+  var nodes = tree.nodes(root).reverse(),
+   links = tree.links(nodes);
+
+  // Normalize for fixed-depth.
+  nodes.forEach(function(d) { d.y = d.depth * 180; });
+
+  // Declare the nodesâ€¦
+  var node = svg.selectAll("g.node")
+   .data(nodes, function(d) { return d.id || (d.id = ++i); });
+
+  // Enter the nodes.
+  var nodeEnter = node.enter().append("g")
+   .attr("class", "node")
+   .attr("transform", function(d) { 
+    return "translate(" + d.y + "," + d.x + ")"; });
+
+  nodeEnter.append("circle")
+   .attr("r", 10)
+   .style("fill", "#fff");
+
+  nodeEnter.append("text")
+   .attr("x", function(d) { 
+    return d.children || d._children ? -13 : 13; })
+   .attr("dy", ".35em")
+   .attr("text-anchor", function(d) { 
+    return d.children || d._children ? "end" : "start"; })
+   .text(function(d) { return d.name; })
+   .style("fill-opacity", 1);
+
+  // Declare the links
+  var link = svg.selectAll("path.link")
+   .data(links, function(d) { return d.target.id; });
+
+  // Enter the links
+  link.enter().insert("path", "g")
+   .attr("class", "link")
+   .attr("d", diagonal);
+
+}
+//sorts the data from rows into tree
+
+function generateTree(){
+//combine duplicates
+	while(rows.length > 1){
+		var dist = 999999;
+		var indexA;
+		var indexB;
+		//find lowest distance
+		for(var i = 0; i<rows.length; i++){
+			for(var j = i+1; j<rows.length; j++){
+				if(distance(rows[i],rows[j]) < dist){
+					dist = distance(rows[i],rows[j]);
+					indexA = i;
+					indexB = j;
+				}
+				
+			}
+		}
+		
+		//create new object with indexA and indexB
+		//remove indexA and indexB
+		var n1 = rows[indexA];
+		var n2 = rows[indexB];
+		rows.push(new Animal(n1, n2, averageAnimal(n1.animal, n2.animal), minDistance));
+		rows.remove(indexB);
+		rows.remove(indexA);
+		
+	}
+}
+
+//calculate distance between animals
+function distance(animal1, animal2) {
+    var distance = 0;
+    // loop through, skipping the 'name' and 'type' columns
+    for (var i = 1; i < animal1.length - 1; i++) {
+        distance += Math.pow(animal1[i] / weights[i] - animal2[i] / weights[i], 2);
+    }
+    return Math.pow(distance, 0.5);
+}
+// a data structure to store animals and clusters as
+function Animal(child1, child2, animal, distance) {
+    // if the two nodes are exactly the same (except for name) combine them
+    // instead of making a parent with two children
+    if (distance == 0 && child1) {
+        this.child1 = null;
+        this.child2 = null;
+        this.animal = animal;
+        this.animal[0] = child1.animal[0] + "\\n" + child2.animal[0];
+        this.distance = distance;
+    } else {
+        this.child1 = child1;
+        this.child2 = child2;
+        this.animal = animal;
+        this.distance = distance;
+        this.height = 0;
+    }
+}
+Animal.prototype.toJSON = function () { 
+    return "{" + "\"name\":\"" + this.animal[0] + "\",\"height\":" + this.height + 
+    ",\"children\":[" + 
+    (this.child1 ? this.child1.toJSON() + "," : "") + 
+    (this.child2 ? this.child2.toJSON() : "") + "]}";
+};
+// average two animals
+function averageAnimal(a1, a2) {
+    var result = a1.slice(0);
+    result[0] = a1[0] + "\\n" + a2[0];
+    for (var i = 1; i < a1.length; i++) {
+        result[i] = a1[i] / 2 + a2[i] / 2;
+    }
+    return result;
+}
+
+</script>
+
+
+</body>
+</html>
