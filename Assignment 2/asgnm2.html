@@ -30,6 +30,8 @@ var svg = d3.select("body").append("svg")
 var rows;
 var dups;
 
+var treeList = [];
+
 d3.csv("zoodata.csv", function(loadedRows) {
   rows = loadedRows;
   doSomethingWithRows();
@@ -88,14 +90,34 @@ function update(source) {
 //sorts the data from rows into tree
 
 function generateTree(){
-//combine duplicates
-	while(rows.length > 1){
+	//load animals into tree
+	for(var i = 0; i<rows.length; i++){
+		var Node = {aniList:null, child1:null, child2:null};
+		Node.aniList = [];
+		Node.aniList.push(rows[i]);
+		treeList.push(Node);
+	}
+	//combine duplicate animals
+	for(var i = 0; i<treeList.length; i++){
+		for(var j = i+1; j<treeList.length; j++){
+			console.log(distance(treeList[i],treeList[j]));
+			if(distance(treeList[i],treeList[j]) == 0){
+				treeList[i].aniList.push(treeList[j].aniList[0]);
+				treeList.splice(j,1);
+				j--;
+			}
+		}
+	}
+	console.log(treeList);
+	//while(rows.length > 1){
+	for(var test = 0; test<10; test++){	
 		var dist = 999999;
 		var indexA;
 		var indexB;
 		//find lowest distance
 		for(var i = 0; i<rows.length; i++){
 			for(var j = i+1; j<rows.length; j++){
+				//console.log(distance(rows[i],rows[j]));
 				if(distance(rows[i],rows[j]) < dist){
 					dist = distance(rows[i],rows[j]);
 					indexA = i;
@@ -109,9 +131,9 @@ function generateTree(){
 		//remove indexA and indexB
 		var n1 = rows[indexA];
 		var n2 = rows[indexB];
-		rows.push(new Animal(n1, n2, averageAnimal(n1.animal, n2.animal), minDistance));
-		rows.remove(indexB);
-		rows.remove(indexA);
+		rows.push(new Animal(n1, n2, averageAnimal(n1, n2), dist));
+		rows.splice(indexB,1);
+		rows.splice(indexA,1);
 		
 	}
 }
@@ -120,10 +142,17 @@ function generateTree(){
 function distance(animal1, animal2) {
     var distance = 0;
     // loop through, skipping the 'name' and 'type' columns
-    for (var i = 1; i < animal1.length - 1; i++) {
-        distance += Math.pow(animal1[i] / weights[i] - animal2[i] / weights[i], 2);
-    }
-    return Math.pow(distance, 0.5);
+	for (key in animal1) {
+		//if(animal1.hasOwnProperty(key)){
+			if (animal1[key] != animal2[key]) {
+				console.log(animal1[key]);
+				distance+=1;
+			}
+		//}
+	}
+	//console.log(distance);
+	return distance;
+    //return Math.pow(distance, 0.5);
 }
 // a data structure to store animals and clusters as
 function Animal(child1, child2, animal, distance) {
@@ -133,7 +162,7 @@ function Animal(child1, child2, animal, distance) {
         this.child1 = null;
         this.child2 = null;
         this.animal = animal;
-        this.animal[0] = child1.animal[0] + "\\n" + child2.animal[0];
+        this.animal[0] = child1[0] + "\\n" + child2[0];
         this.distance = distance;
     } else {
         this.child1 = child1;
@@ -151,13 +180,14 @@ Animal.prototype.toJSON = function () {
 };
 // average two animals
 function averageAnimal(a1, a2) {
-    var result = a1.slice(0);
+    var result = a1;
     result[0] = a1[0] + "\\n" + a2[0];
     for (var i = 1; i < a1.length; i++) {
         result[i] = a1[i] / 2 + a2[i] / 2;
     }
     return result;
 }
+
 
 </script>
 
