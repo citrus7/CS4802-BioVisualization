@@ -3,6 +3,8 @@ Assignment 1
 Jonathan Wu - jtwu
 Conway's Game of Life
 
+Live Demo: http://citrus7.github.io/CS4802-BioVisualization/Assignment%201/
+
 1.  All code is original and is contained in asgnm1.html
 	The script utilizes the paper.js library which was used for graphical display
 2.	I used the standard rules from Conway's Game of Life which are:
