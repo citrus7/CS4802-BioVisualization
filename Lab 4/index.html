@@ -3,17 +3,63 @@ CS 4803 Lab 4-->
 <!DOCTYPE html>
 <html>
 <head>
+</head>
+<body>
 <!-- Load the D3js library -->
-<script src="js/d3.js" charset="utf-8">
-
-<svg width=400" height="300">
-<rect	 cx="200" cy="150" fill="purple" />
-</svg>
+<script src="js/d3.js" charset="utf-8"></script>
+<script type = "text/javascript">
+ //Make an SVG Container
+	var state = 0;
+	var c1 = "purple";
+	var c2 = "yellow"
+	var c3 = "red"
+	var t1 = "Box";
+	var t2 = "Square";
+	var t3 = "2d Cube";
+	
+	var svgContainer = d3.select("body").append("svg")
+                                     .attr("width", 400)
+                                     .attr("height", 300);
+ 
+ //Draw the Rectangle
+	var rectangle = svgContainer.append("rect")
+								.attr("x", svgContainer.attr("width")/2)
+								.attr("y", svgContainer.attr("height")/2)
+								.attr("width", svgContainer.attr("width")/2)
+								.attr("height", svgContainer.attr("height")/2)
+								.attr("fill",c1)
+								.on("click",function(){
+														state++;
+														if(state%3 == 0){
+															svgContainer.selectAll("rect").attr("fill", c2)
+																						.attr("width", svgContainer.attr("width")/4)
+																						.attr("height", svgContainer.attr("height")/4);
+															svgContainer.selectAll("text").text(t2);
+															
+														}else if(state%3 == 1){
+															svgContainer.selectAll("rect").attr("fill", c3)
+																						.attr("width", svgContainer.attr("width")/3)
+																						.attr("height", svgContainer.attr("height")/3);
+															svgContainer.selectAll("text").text(t3);
+														}else{
+															svgContainer.selectAll("rect").attr("fill", c1)
+																						.attr("width", svgContainer.attr("width")/2)
+																						.attr("height", svgContainer.attr("height")/2);
+															svgContainer.selectAll("text").text(t1);
+														}
+														});
+								
+ //Text
+	var myText = svgContainer.append("text")
+								.attr("x", svgContainer.attr("width")*1.5/3)
+								.attr("y", svgContainer.attr("height")*1.5/3-10)
+								.text(t1);
+								
+	
 
 
 </script>
-</head>
-<body>
+
 	
 </body>
 </html>
