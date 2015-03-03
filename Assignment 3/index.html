@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+
+    <title>Assignment 3</title>
+
+    <style>
+
+ .node circle {
+   fill: #fff;
+   stroke: steelblue;
+   stroke-width: 3px;
+ }
+
+ .node text { font: 12px sans-serif; }
+
+ .link {
+   fill: none;
+   stroke: #ccc;
+   stroke-width: 2px;
+ }
+ 
+    </style>
+
+  </head>
+
+  <body>
+
+<!-- load the d3.js library --> 
+<script src="http://d3js.org/d3.v3.min.js"></script>
+ 
+<script src="js/d3.parcoords.js"></script>
+<link rel="stylesheet" type="text/css" href="css/d3.parcoords.css">
+<div id="example" class="parcoords" style="width:360px;height:150px"></div>
+
+<script>
+
+d3.csv('data/breastCancerData.csv', function(data) {
+var pc = d3.parcoords()("#example")
+  .data(data)
+  .render()
+  .ticks(10)
+  .createAxes();
+ });
+</script>
+
+ 
+  </body>
+</html>

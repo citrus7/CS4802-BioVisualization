@@ -58,7 +58,7 @@ var svg = d3.select("body").append("svg")
  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
  
  
- d3.csv("zoodata.csv", function(loadedRows) {
+ d3.csv("data/zoodata.csv", function(loadedRows) {
   rows = loadedRows;
   doSomethingWithRows();
 });
