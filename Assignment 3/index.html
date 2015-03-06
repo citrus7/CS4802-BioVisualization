@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+
+    <title>Assignment 3</title>
+
+  </head>
+
+  <body>
+
+<!-- load the d3.js library --> 
+<script src="http://d3js.org/d3.v3.min.js"></script>
+ 
+<script src="js/d3.parcoords.js"></script>
+<link rel="stylesheet" type="text/css" href="css/d3.parcoords.css">
+<div id="example" class="parcoords" style="width:1280px;height:300px"></div>
+
+<script>
+var colorTest = d3.scale.category10()
+
+var colorPicker = d3.scale.ordinal()
+	.domain([1,2])
+	.range(['#e7969c','#b5cf6b']);
+d3.csv('data/breastCancerData.csv', function(data) {
+var pc = d3.parcoords()("#example")
+  .data(data)
+  .hideAxis(["Sample Code Number"])
+  .hideAxis(["Class"])
+  .composite("darker")
+  .color(function(d){return colorPicker(d.Class);})		
+  .alpha(0.35)
+  .render()
+//  .bushMode("1D-axes")
+  .reorderable()
+  .ticks(10);
+ });
+ 
+ 
+</script>
+
+ 
+  </body>
+</html>
