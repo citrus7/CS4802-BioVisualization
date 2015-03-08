@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+
+    <title>Assignment 4</title>
+
+  </head>
+
+
+
+<!-- load the d3.js library --> 
+<!-- <script src="http://d3js.org/d3.v3.min.js"></script> -->
+<script src="js/d3.js"></script>
+<!-- load data -->
+<script src="data/data1.js"></script>
+<script src="data/data2.js"></script>
+
+<script>
+var memoization = {};
+function longestSubsequence(sequences){
+	console.log(sequences);
+	var seq1 = sequences['seq1'];
+	var seq2 = sequences['seq2'];
+	//var score = sequences['score'];
+	var thisScore = 0;
+	if(seq1.charAt(0) == seq2.charAt(0)){
+		thisScore = 1;
+	}
+	
+	var hash = seq1 + " " + seq2;
+	//check cache
+	if (memoization.hasOwnProperty(hash)) {
+		return memoization[hash];
+	}
+
+	//a
+	//ab
+	
+	//- a
+	//a b
+	
+	//a
+	//a b
+	
+	var abMaxScore = {'seq1':seq1,'seq2':seq2,'score':thisScore};
+	var aMaxScore = {'seq1':seq1,'seq2':seq2,'score':-1};;
+	var bMaxScore = {'seq1':seq1,'seq2':seq2,'score':-1};;
+	
+	
+	//end recursion
+	if(seq1.length == 1 && seq2.length == 1){
+		return({'seq1':seq1,'seq2':seq2, 'score':thisScore});
+		}
+	
+	
+	//ab
+	if(seq1.length > 1 && seq2.length > 1){
+		abMaxScore = longestSubsequence({'seq1':seq1.slice(1,seq1.length),'seq2':seq2.slice(1,seq2.length)});
+	}
+	else {
+		abMaxScore = {'seq1':seq1,'seq2':seq2,'score':thisScore};
+	}	
+	
+	//a-
+	if(seq1.length > 1){
+		aMaxScore = longestSubsequence({'seq1':seq1.slice(1,seq1.length),'seq2':seq2});
+	}
+	
+	
+	
+	//-b
+	if(seq2.length > 1){
+		bMaxScore = longestSubsequence({'seq1':seq1,'seq2':seq2.slice(1,seq2.length)});
+	}
+	
+	if(abMaxScore['score'] >= aMaxScore['score'] && abMaxScore['score'] >= bMaxScore['score']){
+		var retVal = ({'seq1':seq1.charAt(0) + abMaxScore['seq1'],'seq2':seq2.charAt(0) + abMaxScore['seq2'], 'score':thisScore + abMaxScore['score']});
+		memoization[hash] = retVal;
+		//console.log(retVal);
+		return retVal;	
+	}
+	else if(aMaxScore['score'] > bMaxScore['score']){
+		var retVal = ({'seq1':seq1.charAt(0) + aMaxScore['seq1'],'seq2':"-" + aMaxScore['seq2'], 'score':thisScore + aMaxScore['score']});
+		memoization[hash] = retVal;
+		//console.log(retVal);
+		return retVal;
+	}
+	else{
+		var retVal = ({'seq1':"-" + bMaxScore['seq1'],'seq2':seq2.charAt(0) + bMaxScore['seq2'], 'score':thisScore + bMaxScore['score']});
+		memoization[hash] = retVal;
+		//console.log(retVal);
+		return retVal;
+	}
+	
+
+	
+}
+
+function calcScore(sequences){
+	var seq1 = sequences['seq1'];
+	var seq2 = sequences['seq2'];
+	var score = 0;
+	var min = Math.min(seq1.length,seq2.length);
+	for(var i = 0; i<min; i++){
+		if(seq1.charAt(i)!="-" && seq1.charAt(i) == seq2.charAt(i)){
+			score+=1;
+		}
+	}
+	console.log("comparing: ",seq1," to ",seq2,"score: ",score);
+	return score
+}
+//console.log(longestSubsequence({'seq1':data1,'seq2':data2,'index':0}));
+var test = {'seq1':"bb",'seq2':"abab"};
+console.log(longestSubsequence(test));
+</script>
+  <body>
+ 
+  </body>
+</html>
