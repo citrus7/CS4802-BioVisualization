@@ -8,18 +8,49 @@
   </head>
 
 
-
 <!-- load the d3.js library --> 
-<!-- <script src="http://d3js.org/d3.v3.min.js"></script> -->
-<script src="js/d3.js"></script>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<!-- <script src="js/d3.js"></script> -->
 <!-- load data -->
 <script src="data/data1.js"></script>
 <script src="data/data2.js"></script>
 
+<script src="js/jquery.min.js"></script>
+<script src="js/modernizr.min.js"></script>
+
+ <link rel="stylesheet" type="text/css" href="js/sublimeScroll.css">
+ <link rel="stylesheet" type="text/css" href="js/sublimeScrollLite.css">
+ <link rel="stylesheet" type="text/css" href="js/normalize.css">
+
+<script src="js/sublimeScrollLite.js"></script>	
+<script src="js/sublimeScroll.js"></script>
+
+<body bgcolor = "white">
 <script>
+	// Only run on browsers that support css transitions
+	if(Modernizr.csstransforms) {
+		$(document).ready(function() {
+			$.sublimeScroll({
+				top: 60, // px to top
+				bottom: 40, // px to bottom
+				scrollWidth: 200, // Width of scrollbar
+				removeElements: 'script',
+				fixedElements: 'header.top, footer.bottom',
+				contentWidth: 860, // Scroll viewport width
+				minWidth: 1000 // Min width of window to display scroll
+			});
+			$('#content2').sublimeScroll({
+				contentWidth: 583
+			});
+		});
+	}
+</script>
+<script>
+var cacheHits = 0;
+var cycles = 0;
 var memoization = {};
+//find the longest common subsequence
 function longestSubsequence(sequences){
-	console.log(sequences);
 	var seq1 = sequences['seq1'];
 	var seq2 = sequences['seq2'];
 	//var score = sequences['score'];
@@ -31,17 +62,11 @@ function longestSubsequence(sequences){
 	var hash = seq1 + " " + seq2;
 	//check cache
 	if (memoization.hasOwnProperty(hash)) {
+		cacheHits+=1;
 		return memoization[hash];
+	}else{
+		cycles+=1;
 	}
-
-	//a
-	//ab
-	
-	//- a
-	//a b
-	
-	//a
-	//a b
 	
 	var abMaxScore = {'seq1':seq1,'seq2':seq2,'score':thisScore};
 	var aMaxScore = {'seq1':seq1,'seq2':seq2,'score':-1};;
@@ -59,15 +84,13 @@ function longestSubsequence(sequences){
 		abMaxScore = longestSubsequence({'seq1':seq1.slice(1,seq1.length),'seq2':seq2.slice(1,seq2.length)});
 	}
 	else {
-		abMaxScore = {'seq1':seq1,'seq2':seq2,'score':thisScore};
+		abMaxScore = {'seq1':seq1.slice(1,seq1.length),'seq2':seq2.slice(1,seq2.length),'score':0};
 	}	
 	
 	//a-
 	if(seq1.length > 1){
 		aMaxScore = longestSubsequence({'seq1':seq1.slice(1,seq1.length),'seq2':seq2});
 	}
-	
-	
 	
 	//-b
 	if(seq2.length > 1){
@@ -81,40 +104,100 @@ function longestSubsequence(sequences){
 		return retVal;	
 	}
 	else if(aMaxScore['score'] > bMaxScore['score']){
-		var retVal = ({'seq1':seq1.charAt(0) + aMaxScore['seq1'],'seq2':"-" + aMaxScore['seq2'], 'score':thisScore + aMaxScore['score']});
+		var retVal = ({'seq1':seq1.charAt(0) + aMaxScore['seq1'],'seq2':"-" + aMaxScore['seq2'], 'score':aMaxScore['score']});
 		memoization[hash] = retVal;
 		//console.log(retVal);
 		return retVal;
 	}
 	else{
-		var retVal = ({'seq1':"-" + bMaxScore['seq1'],'seq2':seq2.charAt(0) + bMaxScore['seq2'], 'score':thisScore + bMaxScore['score']});
+		var retVal = ({'seq1':"-" + bMaxScore['seq1'],'seq2':seq2.charAt(0) + bMaxScore['seq2'], 'score':bMaxScore['score']});
 		memoization[hash] = retVal;
 		//console.log(retVal);
 		return retVal;
 	}
-	
-
-	
 }
-
-function calcScore(sequences){
-	var seq1 = sequences['seq1'];
-	var seq2 = sequences['seq2'];
-	var score = 0;
-	var min = Math.min(seq1.length,seq2.length);
-	for(var i = 0; i<min; i++){
-		if(seq1.charAt(i)!="-" && seq1.charAt(i) == seq2.charAt(i)){
-			score+=1;
-		}
+//function to determine color
+function colorPicker(ch){
+	if(ch == "A"){
+		return "#FF6699";
+	}else if(ch == "T"){
+		return "#6699FF";
+	}else if(ch == "C"){
+		return "#66FF99";
+	}else{
+		return "#FFFF99";
 	}
-	console.log("comparing: ",seq1," to ",seq2,"score: ",score);
-	return score
 }
-//console.log(longestSubsequence({'seq1':data1,'seq2':data2,'index':0}));
-var test = {'seq1':"bb",'seq2':"abab"};
-console.log(longestSubsequence(test));
+
+
+//calculate the sequence
+var results = longestSubsequence({'seq1':data1,'seq2':data2});
+//var results = longestSubsequence({'seq1':"ATCGGCATGCAGATGGATGAGTAGTGAGTGAGTGTGAGTGAGAGTGACATCGATCGATCGTCGAGTCGTAC",'seq2':"CGACTGACTAGCTAGCACGTGCAGTGACGTAGTAGGTAGTGAGAGAGGAGAGTCTACGATCGTACGATCGATCGATCGATCG"});
+console.log("Cache Hits: ",cacheHits);
+console.log("Cycles :",cycles);
+
+var s1Length = results['seq1'].length;
+var s2Length = results['seq2'].length;
+var maxLength = Math.max(s1Length,s2Length);
+var minLength = Math.min(s1Length,s2Length);
+
+//draw the results
+var svgContainer = d3.select("body").append("svg")
+								 .attr("width", 400)
+								 .attr("height",(minLength*20));
+
+var seq1Label = svgContainer.append("text")
+						.attr("x", svgContainer.attr("width")/3)
+						.attr("y", 75)
+						.attr("font-weight","bold")
+						.text("Seq 1:");
+						
+var seq2Text = svgContainer.append("text")
+						.attr("x", svgContainer.attr("width")/2)
+						.attr("y", 75)
+						.attr("font-weight","bold")
+						.text("Seq2");
+						
+var seq2Text = svgContainer.append("text")
+						.attr("x", svgContainer.attr("width")/1.4)
+						.attr("y", 75)
+						.attr("font-weight","bold")
+						.text("Matching:");
+
+								 
+								 
+for(var i = 0; i<minLength; i++){
+
+	if(results['seq1'][i] == results['seq2'][i]){
+		c1 = colorPicker(results['seq1'][i]);
+		var highlightBox = svgContainer.append("rect")
+								.attr("x", svgContainer.attr("width")/3-2)
+								.attr("y", i*20-15+100)
+								.attr("width", 200)
+								.attr("height", 20)
+								.attr("fill",c1)
+								.attr("opacity",0.35);
+								
+		var seq3Text = svgContainer.append("text")
+						.attr("x", svgContainer.attr("width")/1.3)
+						.attr("y", i*20+100)
+						.text(results['seq1'][i]);
+								}
+								
+	var seq1Text = svgContainer.append("text")
+							.attr("x", svgContainer.attr("width")/3)
+							.attr("y", i*20+100)
+							.text(results['seq1'][i]);
+							
+	var seq2Text = svgContainer.append("text")
+							.attr("x", svgContainer.attr("width")/2)
+							.attr("y", i*20+100)
+							.text(results['seq2'][i]);
+	
+}
+
 </script>
-  <body>
+
  
   </body>
 </html>
