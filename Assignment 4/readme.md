@@ -11,5 +11,5 @@ Comparing two strings of length 800 each, this method compared 644,810 cycles, a
 
 For visualization I displayed each character on it's own line next to the corresponding character in the second sequence.  Identical characters are shown in a third column.  A zoomed out view of the entire sequence is shown in a preview bar on the right so that users can keep track of their position in the sequence.  
 
-
+Library used for preview pane:  https://github.com/demux/sublime-scroll/
 
