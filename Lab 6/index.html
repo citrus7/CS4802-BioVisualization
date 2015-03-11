@@ -1,0 +1,124 @@
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+
+<!-- underscore has some useful helper functions like _.contains and _.uniq that d3 doesn't -->
+<script src="http://underscorejs.org/underscore-min.js" charset="utf-8"></script>
+
+<style>
+
+.link {
+  stroke: #999;
+  stroke-opacity: .6;
+}
+
+</style>
+
+<script>
+
+d3.csv('Bandyopadhyay2010.csv', function(err, d) {
+  if(err) return console.log(err);
+
+  console.log("Success! Data loaded.");
+
+  // extract nodes
+  var nodes = [];
+  d.forEach(function(data) { 
+	var obj = {"name": data.BAIT_OFFICIAL_SYMBOL, "group": 1};
+    nodes.push(obj);
+  });
+  d.map(function(data) { 
+    var obj = {"name": data.PREY_OFFICIAL_SYMBOL, "group": 2}
+    nodes.push(obj);
+  });
+  nodes = _.sortBy(nodes, function(n){ return n.name; });
+  nodes = _.uniq(nodes, true, function(n) { return n.name; });
+  // e.g. {"name":"Myriel","group":1},
+  var nodes = [];
+  d.forEach(function(r) { 
+// TODO    var obj = {"name": ???, "group": 1}
+    nodes.push(obj);
+  });
+  d.map(function(r) { 
+// TODO    var obj = {"name": ???, "group": 2}
+    nodes.push(obj);
+  });
+
+  nodes = _.sortBy(nodes, function(n){ return n.name; });
+  nodes = _.uniq(nodes, true, function(n) { return n.name; });
+
+  // extract links
+  // TODO similar to the nodes above, fill in the correct column reference for the source and targets below
+  // e.g. {"source":1,"target":0,"value":1},
+  var links = [];
+  var bisect = d3.bisector(function(d) { return d.name; }).left;
+  d.forEach(function(r) { 
+	var source = bisect(nodes, r.BAIT_OFFICIAL_SYMBOL),
+		target = bisect(nodes, r.PREY_OFFICIAL_SYMBOL);
+
+    links.push( {"source": source, "target": target, "value": 1} ); 
+  });
+
+  var graph = {
+    "nodes": nodes,
+    "links": links
+  }
+
+  draw( graph );
+})
+
+
+function draw( graph ) {
+   var width = 800,
+      height = 800;
+
+  var color = d3.scale.category20();
+
+  var force = d3.layout.force()
+	.charge(-60)
+    .linkDistance(20)
+    .gravity(0.2)
+    .size([width, height]);
+
+  var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+  force
+	.nodes(graph.nodes)
+    .links(graph.links)
+    .start();
+
+  // TODO In the first TODO, decide what we should be appending for each "link". In the second TODO, figure out what CSS class should correspond to links.
+  var link = svg.selectAll(".link")
+    .data(graph.links)
+	.enter().append("line")
+    .attr("class", "link");
+	
+  // TODO Decide what should be appended for each "node". Set the attributes (e.g. size, width, radius, etcetera. Also set it's style-- "fill" at minimum (consider using the color object defined above, but not necessarily).
+  var node = svg.selectAll(".node")
+    .data(graph.nodes)
+	.enter().append("circle")
+    .attr("r", 5)
+    .attr("fill", function (d) { return color(d.name); })
+    .call(force.drag);
+
+  node.append("title")
+    .text(function(d) { return d.name; });
+
+  // TODO Whatever you made the links and nodes, you must set their x and y values in the force tick function.
+  force.on("tick", function() {
+    
+    // TODO EXAMPLE: if you made links into [SVG lines](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/line), you'd set x1 y1 x2 y2 below
+    link
+	  .attr("x1", function(d) { return d.source.x; })
+      .attr("y1", function(d) { return d.source.y; })
+      .attr("x2", function(d) { return d.target.x; })
+      .attr("y2", function(d) { return d.target.y; });
+
+    // TODO Whatever you made the "nodes" above, set the x and y here.
+    node
+      .attr("cx", function(d) { return d.x; })
+      .attr("cy", function(d) { return d.y; });
+  });
+}
+
+</script>
