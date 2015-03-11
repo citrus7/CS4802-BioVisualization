@@ -34,11 +34,11 @@ d3.csv('Bandyopadhyay2010.csv', function(err, d) {
   // e.g. {"name":"Myriel","group":1},
   var nodes = [];
   d.forEach(function(r) { 
-// TODO    var obj = {"name": ???, "group": 1}
+	var obj = {"name": r.BAIT_OFFICIAL_SYMBOL, "group": 1};
     nodes.push(obj);
   });
   d.map(function(r) { 
-// TODO    var obj = {"name": ???, "group": 2}
+	var obj = {"name": r.PREY_OFFICIAL_SYMBOL, "group": 2}
     nodes.push(obj);
   });
 
